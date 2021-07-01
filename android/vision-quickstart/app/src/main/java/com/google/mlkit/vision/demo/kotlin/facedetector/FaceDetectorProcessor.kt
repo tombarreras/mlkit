@@ -22,18 +22,24 @@ import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.demo.GraphicOverlay
 import com.google.mlkit.vision.demo.kotlin.VisionProcessorBase
+import com.google.mlkit.vision.demo.kotlin.posedetector.PoseDetectorProcessor
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.google.mlkit.vision.face.FaceLandmark
+import java.util.ArrayList
 import java.util.Locale
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 /** Face Detector Demo.  */
-class FaceDetectorProcessor(context: Context, detectorOptions: FaceDetectorOptions?) :
-  VisionProcessorBase<List<Face>>(context) {
+class FaceDetectorProcessor(private val context: Context, detectorOptions: FaceDetectorOptions?) :
+  VisionProcessorBase<List<FaceWithClassifications>>(context) {
 
   private val detector: FaceDetector
+  private val classificationExecutor: Executor
+  private var faceClassifierProcessor: FaceClassifierProcessor? = null
 
   init {
     val options = detectorOptions
@@ -43,6 +49,7 @@ class FaceDetectorProcessor(context: Context, detectorOptions: FaceDetectorOptio
         .build()
 
     detector = FaceDetection.getClient(options)
+    classificationExecutor = Executors.newSingleThreadExecutor()
 
     Log.v(MANUAL_TESTING_LOG, "Face detector options: $options")
   }
@@ -52,14 +59,30 @@ class FaceDetectorProcessor(context: Context, detectorOptions: FaceDetectorOptio
     detector.close()
   }
 
-  override fun detectInImage(image: InputImage): Task<List<Face>> {
+  override fun detectInImage(image: InputImage): Task<List<FaceWithClassifications>> {
     return detector.process(image)
+      .continueWith(
+        classificationExecutor,
+        { task ->
+          if (faceClassifierProcessor == null) {
+            faceClassifierProcessor = FaceClassifierProcessor(context)
+          }
+          val faces = task.result
+          val facesWithClassification: MutableList<FaceWithClassifications> = mutableListOf()
+
+          for (face:Face in faces){
+            facesWithClassification.add(faceClassifierProcessor!!.getFaceClassifications(face, image))
+          }
+          facesWithClassification
+        }
+      )
+
   }
 
-  override fun onSuccess(faces: List<Face>, graphicOverlay: GraphicOverlay) {
-    for (face in faces) {
-      graphicOverlay.add(FaceGraphic(graphicOverlay, face))
-      logExtrasForTesting(face)
+  override fun onSuccess(results: List<FaceWithClassifications>, graphicOverlay: GraphicOverlay) {
+    for (faceWithClassifications in results) {
+      graphicOverlay.add(FaceGraphic(graphicOverlay, faceWithClassifications.face, faceWithClassifications.classifications))
+      logExtrasForTesting(faceWithClassifications.face)
     }
   }
 

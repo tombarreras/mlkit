@@ -14,13 +14,16 @@
           androidx.camera.camera2, androidx.camera.core,
           androidx.camera.view, androidx.camera.lifecycle" />
 
+    <!-- TODO: should be android.hardware.camera.any to support devices without a back camera -->
     <uses-feature android:name="android.hardware.camera"/>
 
+    <!-- TODO: double check these -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- TODO: change these -->
     <application
         android:name="androidx.multidex.MultiDexApplication"
         android:icon="@drawable/logo_mlkit"
@@ -31,7 +34,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
 
-        <!-- Optional: Add it to automatically download ML model to device after
+        <!-- TODO: Optional: Add it to automatically download ML model to device after
           your app is installed.-->
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

@@ -57,7 +57,6 @@ import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import java.io.IOException
 import java.util.ArrayList
-import kotlin.math.max
 
 /** Activity demonstrating different image detector features with a still image from camera.  */
 @KeepName
