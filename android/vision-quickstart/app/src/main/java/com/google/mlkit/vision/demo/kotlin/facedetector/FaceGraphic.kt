@@ -16,10 +16,7 @@
 
 package com.google.mlkit.vision.demo.kotlin.facedetector
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import com.google.mlkit.vision.demo.GraphicOverlay
 import com.google.mlkit.vision.demo.GraphicOverlay.Graphic
 import com.google.mlkit.vision.demo.kotlin.posedetector.PoseGraphic
@@ -28,6 +25,7 @@ import com.google.mlkit.vision.face.FaceLandmark.LandmarkType
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 /**
  * Graphic instance for rendering face position, contour, and landmarks within the associated
@@ -65,16 +63,16 @@ class FaceGraphic constructor(overlay: GraphicOverlay?, private val face: Face, 
 
   /** Draws the face annotations for position on the supplied canvas.  */
   override fun draw(canvas: Canvas) {
-    val x = translateX(face.boundingBox.centerX().toFloat())
-    val y = translateY(face.boundingBox.centerY().toFloat())
+//    val x = translateX(face.boundingBox.centerX().toFloat())
+//    val y = translateY(face.boundingBox.centerY().toFloat())
 
     // Calculate positions.
-    val left = x - scale(face.boundingBox.width() / 2.0f)
-    val top = y - scale(face.boundingBox.height() / 2.0f)
-    val right = x + scale(face.boundingBox.width() / 2.0f)
-    val bottom = y + scale(face.boundingBox.height() / 2.0f)
-    val lineHeight = ID_TEXT_SIZE + BOX_STROKE_WIDTH
-    var yLabelOffset: Float = if (face.trackingId == null) 0f else -lineHeight
+//    val left = x - scale(face.boundingBox.width() / 2.0f)
+//    val top = y - scale(face.boundingBox.height() / 2.0f)
+//    val right = x + scale(face.boundingBox.width() / 2.0f)
+//    val bottom = y + scale(face.boundingBox.height() / 2.0f)
+//    val lineHeight = ID_TEXT_SIZE + BOX_STROKE_WIDTH
+//    var yLabelOffset: Float = if (face.trackingId == null) 0f else -lineHeight
 
     // Decide color based on face ID
     val colorID = if (face.trackingId == null) 0 else abs(face.trackingId!! % NUM_COLORS)
@@ -87,6 +85,8 @@ class FaceGraphic constructor(overlay: GraphicOverlay?, private val face: Face, 
     rect.right = max(x0, x1)
     rect.top = translateY(rect.top)
     rect.bottom = translateY(rect.bottom)
+//    canvas.drawRect(FaceBoundingBoxExpander.expandedBoundingBox(Rect(rect.left.roundToInt(), rect.top.roundToInt(), rect.right.roundToInt(), rect.bottom.roundToInt()),
+//      canvas.width, canvas.height), boxPaints[colorID])
     canvas.drawRect(rect, boxPaints[colorID])
 
     // Draw face classification text.
